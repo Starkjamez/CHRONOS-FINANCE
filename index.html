@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CHRONOS FINANCE | Quantum Tracking</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+    <style>
+        body {
+            background: radial-gradient(circle at top right, #1e293b, #0f172a, #020617);
+            color: #f8fafc;
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .neon-text {
+            text-shadow: 0 0 10px rgba(34, 211, 238, 0.5);
+        }
+        .progress-ring-circle {
+            transition: stroke-dashoffset 0.8s ease-in-out;
+            transform: rotate(-90deg);
+            transform-origin: 50% 50%;
+        }
+        .modal-bg {
+            background: rgba(2, 6, 23, 0.8);
+            backdrop-filter: blur(8px);
+        }
+    </style>
+</head>
+<body class="p-4 md:p-12">
+
+    <div id="modal" class="fixed inset-0 z-50 flex items-center justify-center modal-bg hidden animate__animated animate__fadeIn">
+        <div class="glass-panel p-8 rounded-3xl w-full max-w-md border-cyan-500/50">
+            <h2 class="text-xl font-bold mb-6 neon-text uppercase tracking-widest">Update Goal Parameters</h2>
+            <div class="space-y-4">
+                <div>
+                    <label class="text-[10px] uppercase text-slate-400">Target Amount ($)</label>
+                    <input id="in-target" type="number" value="10000" class="w-full bg-slate-900/50 border border-slate-700 rounded-lg p-3 outline-none focus:border-cyan-500 transition">
+                </div>
+                <div>
+                    <label class="text-[10px] uppercase text-slate-400">Current Balance ($)</label>
+                    <input id="in-current" type="number" value="7500" class="w-full bg-slate-900/50 border border-slate-700 rounded-lg p-3 outline-none focus:border-cyan-500 transition">
+                </div>
+                <div>
+                    <label class="text-[10px] uppercase text-slate-400">Time Horizon (Months)</label>
+                    <input id="in-months" type="number" value="12" class="w-full bg-slate-900/50 border border-slate-700 rounded-lg p-3 outline-none focus:border-cyan-500 transition">
+                </div>
+                <div class="flex gap-4 pt-4">
+                    <button onclick="toggleModal()" class="flex-1 px-4 py-2 border border-slate-700 rounded-xl hover:bg-slate-800 transition">Cancel</button>
+                    <button onclick="updateDashboard()" class="flex-1 px-4 py-2 bg-cyan-500 text-slate-900 font-bold rounded-xl hover:bg-cyan-400 transition">Sync Data</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <nav class="max-w-6xl mx-auto flex justify-between items-center mb-12 animate__animated animate__fadeInDown">
+        <div class="flex items-center gap-2">
+            <div class="w-8 h-8 bg-cyan-500 rounded-lg rotate-45 flex items-center justify-center shadow-[0_0_15px_rgba(6,182,212,0.5)]">
+                <span class="text-white font-bold -rotate-45">C</span>
+            </div>
+            <h1 class="text-xl font-black tracking-widest uppercase neon-text">Chronos</h1>
+        </div>
+        <button onclick="toggleModal()" class="px-6 py-2 border border-cyan-500/30 rounded-full text-xs uppercase tracking-widest hover:bg-cyan-500/10 transition">Configure Goal</button>
+    </nav>
+
+    <main class="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8">
+        
+        <div class="lg:col-span-8">
+            <h2 class="text-5xl md:text-7xl font-extrabold leading-tight mb-4">OPTIMIZE<br><span class="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-500">YOUR CAPITAL</span></h2>
+            <div class="flex items-center gap-4 text-slate-400 mb-8">
+                <span class="w-12 h-[1px] bg-slate-700"></span>
+                <p class="text-sm tracking-widest uppercase">Status: Neural Sync Active</p>
+            </div>
+        </div>
+
+        <div class="lg:col-span-4 glass-panel p-8 rounded-3xl border-cyan-500/20 text-center relative overflow-hidden">
+            <div class="absolute top-0 right-0 p-2 opacity-20 text-[8px] uppercase">Goal ID: #882-X</div>
+            <p class="text-[10px] uppercase tracking-[0.3em] text-slate-500 mb-6">Quantum Progress</p>
+            <div class="flex justify-center relative mb-6">
+                <svg width="160" height="160">
+                    <circle class="text-slate-800/50" stroke-width="10" stroke="currentColor" fill="transparent" r="70" cx="80" cy="80"/>
+                    <circle id="ring" class="text-cyan-400 progress-ring-circle" stroke-width="10" stroke-dasharray="439.8" stroke-dashoffset="110" stroke-linecap="round" stroke="currentColor" fill="transparent" r="70" cx="80" cy="80"/>
+                </svg>
+                <div class="absolute inset-0 flex flex-col items-center justify-center">
+                    <span id="percent-text" class="text-4xl font-black text-white neon-text">75%</span>
+                </div>
+            </div>
+            <p id="goal-label" class="text-cyan-400 text-xs font-bold tracking-widest uppercase">Deep Space Savings</p>
+        </div>
+
+        <div class="lg:col-span-6 glass-panel p-8 rounded-3xl flex justify-between items-center">
+            <div>
+                <p class="text-[10px] uppercase tracking-widest text-slate-500 mb-1">Monthly Flow Required</p>
+                <h3 id="monthly-out" class="text-4xl font-bold">$625.00</h3>
+            </div>
+            <div class="text-right">
+                <div class="text-cyan-500 text-xs mb-1">PROJECTED COMPLETION</div>
+                <div id="completion-stat" class="text-sm font-mono uppercase">Dec 2026</div>
+            </div>
+        </div>
+
+        <div class="lg:col-span-6 glass-panel p-8 rounded-3xl border-purple-500/20">
+            <div class="flex justify-between items-center h-full">
+                <p class="text-sm text-slate-400 italic">"The best way to predict the future is to automate it."</p>
+                <div class="w-12 h-12 rounded-full bg-gradient-to-tr from-purple-500 to-cyan-500 animate-pulse"></div>
+            </div>
+        </div>
+
+    </main>
+
+    <script>
+        function toggleModal() {
+            document.getElementById('modal').classList.toggle('hidden');
+        }
+
+        function updateDashboard() {
+            // 1. Get Values
+            const target = parseFloat(document.getElementById('in-target').value);
+            const current = parseFloat(document.getElementById('in-current').value);
+            const months = parseInt(document.getElementById('in-months').value);
+
+            // 2. Logic
+            const percentage = Math.min(100, (current / target) * 100);
+            const monthly = (target - current) / months;
+
+            // 3. Update Ring (Circumference is 2 * PI * 70 = 439.8)
+            const circumference = 439.8;
+            const offset = circumference - (percentage / 100) * circumference;
+            document.getElementById('ring').style.strokeDashoffset = offset;
+
+            // 4. Update Texts
+            document.getElementById('percent-text').innerText = Math.round(percentage) + "%";
+            document.getElementById('monthly-out').innerText = "$" + (monthly > 0 ? monthly.toLocaleString(undefined, {minimumFractionDigits: 2}) : "0.00");
+            
+            // Close Modal
+            toggleModal();
+        }
+
+        // Initialize on load
+        window.onload = updateDashboard;
+    </script>
+</body>
+</html>
